@@ -1,0 +1,70 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "AAD Object ID": {
+            "metadata": {
+                "description": "Object ID of the User, Group or Service Principal"
+            },
+            "type": "string"
+        },
+        "Role Definition ID": {
+            "metadata": {
+                "description": "Identifier (GUID) of the role definition to map to service principal"
+            },
+            "type": "securestring"
+        }
+    },
+    "variables": {
+        "Full Role Definition ID": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', parameters('Role Definition ID'))]",
+        "Logic App Name": "EmptyLogicApp",
+        "Logic App Assignment Name" : "[concat(variables('Logic App Name'), '/Microsoft.Authorization/', guid(concat(resourceGroup().id), variables('Full Role Definition ID')))]"
+    },
+    "resources": [
+        {
+            "apiVersion": "2016-06-01",
+            "type": "Microsoft.Logic/workflows",
+            "name": "[variables('Logic App Name')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [],
+            "properties": {
+                "state": "Enabled",
+                "parameters": {},
+                "definition": {
+                    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {},
+                    "triggers": {},
+                    "actions": {},
+                    "outputs": {}
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Authorization/roleAssignments",
+            "apiVersion": "2017-09-01",
+            "name": "[guid(concat(resourceGroup().id), resourceId('Microsoft.Logic/workflows', 'EmptyLogicApp'), variables('Full Role Definition ID'))]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Logic/workflows', 'EmptyLogicApp')]"
+            ],
+            "properties": {
+                "roleDefinitionId": "[variables('Full Role Definition ID')]",
+                "principalId": "[parameters('AAD Object ID')]",
+                "scope": "[resourceGroup().id]"
+            }
+        },
+        {
+            "type": "Microsoft.Logic/workflows/providers/roleAssignments",
+            "apiVersion": "2017-05-01",
+            "name": "[variables('Logic App Assignment Name')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Logic/workflows', 'EmptyLogicApp')]"
+            ],
+            "properties": {
+                "roleDefinitionId": "[variables('Full Role Definition ID')]",
+                "principalId": "[parameters('AAD Object ID')]",
+            }
+        }
+    ],
+    "outputs": {}
+}
