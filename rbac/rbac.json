@@ -62,7 +62,7 @@
             ],
             "properties": {
                 "roleDefinitionId": "[variables('Full Role Definition ID')]",
-                "principalId": "[parameters('AAD Object ID')]",
+                "principalId": "[parameters('AAD Object ID')]"
             }
         }
     ],
