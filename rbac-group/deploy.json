@@ -1,0 +1,31 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "roleAssignments": {
+            "metadata": {
+                "description": "Array of objects containing two properties:  roleDefinitionId and principalId"
+            },
+            "type": "array"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "name": "[guid(concat(resourceGroup().id, copyIndex(), parameters('roleAssignments')[copyIndex()].roleDefinitionId, parameters('roleAssignments')[copyIndex()].principalId))]",
+            "type": "Microsoft.Authorization/roleAssignments",
+            "comments": "We simply ommit the 'scope' property when we want the assignment to be done at the resource group level",
+            "apiVersion": "2020-04-01-preview",
+            "copy": {
+                "name": "role-assignment-copy",
+                "count": "[length(parameters('roleAssignments'))]"
+            },
+            "dependsOn": [],
+            "properties": {
+                "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', parameters('roleAssignments')[copyIndex()].roleDefinitionId)]",
+                "principalId": "[parameters('roleAssignments')[copyIndex()].principalId]"
+            }
+        }
+    ],
+    "outputs": {}
+}

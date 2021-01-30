@@ -1,0 +1,18 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "roleAssignments": {
+            "value": [
+                {
+                    "comment-1": "Check https://docs.microsoft.com/en-us/azure/role-based-access-control/built-in-roles for role definition ids",
+                    "comment-2": "Here we use the 'Storage Blob Data Reader' role as example",
+                    "comment-3": "principalId need to be object-id of user, group or service principal ; those can be found in AAD",
+                    "comment-4": "Obviously, the principal ID provided here is wrong",
+                    "roleDefinitionId": "2a2b9908-6ea1-4ae2-8e65-a410df84e7d1",
+                    "principalId": "XYZ"
+                }
+            ]
+        }
+    }
+}
